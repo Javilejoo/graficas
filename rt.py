@@ -1,5 +1,5 @@
 from math import tan, pi
-import numpy as np
+import mathlib as ml
 #Mi libreria de graficas
 class Raytracer(object):
     def __init__(self, screen):
@@ -82,7 +82,7 @@ class Raytracer(object):
 
                     #Crear un rayo
                     direction = (Px, Py, -self.nearPlane)
-                    direction = direction / np.linalg.norm(direction)
+                    direction = ml.multiplicar_vector_por_escalar(direction, 1 / ml.norma_linalg(direction))
 
                     intercept = self.rtCastRay(self.camPosition, direction)
                     

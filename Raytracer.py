@@ -14,7 +14,7 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWAC
 screen.set_alpha(None)
 
 raytracer = Raytracer(screen)
-raytracer.rtClearColor(0.25,0.25,0.25)
+raytracer.rtClearColor(0.25,0.25,0.85)
 
 """ brick = Material(diffuse = (1,0.4,0.4), spec = 8, ks = 0.01)
 grass = Material(diffuse = (0.4,1,0.4), spec =32, ks = 0.1) 

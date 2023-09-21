@@ -1,9 +1,10 @@
+import mathlib as ml
 import numpy as np
 def reflectVector(normal,direction):
-    reflect = 2* np.dot(normal, direction)
+    reflect = 2* ml.producto_punto(normal, direction)
     reflect = np.multiply(reflect, normal)
-    reflect = np.subtract(reflect, direction)
-    reflect =reflect / np.linalg.norm(reflect)
+    reflect = ml.restar_vectores(reflect, direction)
+    reflect = ml.multiplicar_vector_por_escalar(reflect, 1 / ml.norma_linalg(reflect))
     return reflect
 
 class Light(object):
@@ -30,12 +31,12 @@ class AmbientLight(Light):
 
 class DirectionalLight(Light):
     def __init__(self, direction = (0,-1,0), intensity = 1, color = (1,1,1)):
-        self.direction = direction / np.linalg.norm(direction)
+        self.direction = ml.multiplicar_vector_por_escalar(direction, 1 / ml.norma_linalg(direction))
         super().__init__(intensity, color, "Directional")
 
     def getDiffuseColor(self, intercept):
         dir = [(i * -1) for i in self.direction] 
-        intensity = np.dot(intercept.normal, dir) * self.intensity
+        intensity = ml.producto_punto(intercept.normal, dir) * self.intensity
         intensity = max(0,min(1, intensity))
         intensity *= 1 - intercept.obj.material.ks
 
@@ -47,9 +48,10 @@ class DirectionalLight(Light):
         reflect = reflectVector(intercept.normal, dir)
 
         viewDir = np.subtract(viewPos, intercept.point)
-        viewDir = viewDir / np.linalg.norm(viewDir)
+        viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / ml.norma_linalg(viewDir))
 
-        specIntensity = max(0, np.dot(viewDir, reflect)) ** intercept.obj.material.spec
+
+        specIntensity = max(0, ml.producto_punto(viewDir, reflect)) ** intercept.obj.material.spec
         specIntensity *= intercept.obj.material.ks
         specIntensity *= self.intensity
 
@@ -62,8 +64,8 @@ class PointLight(Light):
 
     def getDiffuseColor(self, intercept):
         dir = np.subtract(self.point,intercept.point)
-        dir = dir / np.linalg.norm(dir)
-        intensity = np.dot(intercept.normal, dir) * self.intensity
+        dir = ml.multiplicar_vector_por_escalar(dir, 1 / ml.norma_linalg(dir))
+        intensity = ml.producto_punto(intercept.normal, dir) * self.intensity
         intensity = max(0,min(1, intensity))
         intensity *= 1 - intercept.obj.material.ks
 
@@ -75,9 +77,9 @@ class PointLight(Light):
         reflect = reflectVector(intercept.normal, dir)
 
         viewDir = np.subtract(viewPos, intercept.point)
-        viewDir = viewDir / np.linalg.norm(viewDir)
+        viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / ml.norma_linalg(viewDir))
 
-        specIntensity = max(0, np.dot(viewDir, reflect)) ** intercept.obj.material.spec
+        specIntensity = max(0, ml.producto_punto(viewDir, reflect)) ** intercept.obj.material.spec
         specIntensity *= intercept.obj.material.ks
         specIntensity *= self.intensity
 
