@@ -1,11 +1,62 @@
-import mathlib as ml
-import numpy as np
+import mathLib as ml
+from math import acos, asin
 def reflectVector(normal,direction):
     reflect = 2* ml.producto_punto(normal, direction)
-    reflect = np.multiply(reflect, normal)
+    reflect = ml.multiplicar_vector_por_escalar(normal,reflect)
     reflect = ml.restar_vectores(reflect, direction)
     reflect = ml.multiplicar_vector_por_escalar(reflect, 1 / ml.norma_linalg(reflect))
     return reflect
+
+def refractVector(normal, incident, n1,n2): 
+    # Snell´s Law
+    c1 = ml.producto_punto(normal,incident)
+
+    if c1 < 0:
+        c1 = -c1
+    else:
+        normal = ml.normalizar(normal)
+        normal = [i * -1 for i in normal]
+    
+        #normal = np.array(normal) * -1
+        n1, n2 = n2, n1
+
+    n = n1 / n2
+
+    T = ml.restar_vectores( ml.multiplicar_vector_por_escalar((ml.sumar_vectores(incident ,  ml.multiplicar_vector_por_escalar(normal,c1))),n  ) , ml.multiplicar_vector_por_escalar(normal ,(1 - n**2 * (1 - c1**2))** 0.5))
+    T = ml.multiplicar_vector_por_escalar(T, 1 / ml.norma_linalg(T))
+
+    return T
+
+def totalInternalReflection(normal,incident,n1,n2):
+    c1 = ml.producto_punto(normal,incident)
+    if c1 < 0:
+        c1 = -c1
+    else:
+        n1, n2 = n2, n1
+
+    if n1 < n2:
+        return False
+    
+
+    return acos(c1) >= asin(n2/n1)
+
+def fresnel(normal,incident,n1, n2):
+    c1 = ml.producto_punto(normal,incident)
+    if c1 < 0:
+        c1 = -c1
+    else:
+        n1, n2 = n2, n1
+        
+    s2 = (n1 * (1 - c1**2)**0.5) / n2
+    c2 = (1 - s2 **2) **0.5
+    F1 = (( (n2 * c1) - (n1 * c2) ) / ((n2 * c1) + (n1 *c2))) **2
+    F2 = (((n1 * c2) - (n2 * c1)) / ((n1 * c2) + (n2 *c1))) **2
+
+
+    Kr = (F1 + F2) / 2
+    Kt = 1 - Kr
+    return Kr, Kt
+
 
 class Light(object):
     def __init__(self, intensity = 1, color = (1,1,1), lightType = "None"):
@@ -47,7 +98,8 @@ class DirectionalLight(Light):
 
         reflect = reflectVector(intercept.normal, dir)
 
-        viewDir = np.subtract(viewPos, intercept.point)
+        
+        viewDir = ml.restar_vector_de_vector(viewPos,intercept.point)
         viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / ml.norma_linalg(viewDir))
 
 
@@ -63,8 +115,9 @@ class PointLight(Light):
         super().__init__(intensity,color, "Point")
 
     def getDiffuseColor(self, intercept):
-        dir = np.subtract(self.point,intercept.point)
-        dir = ml.multiplicar_vector_por_escalar(dir, 1 / ml.norma_linalg(dir))
+        dir = ml.restar_vector_de_vector(self.point,intercept.point)
+        self.dir = ml.multiplicar_vector_por_escalar(dir, 1 / ml.norma_linalg(dir))
+
         intensity = ml.producto_punto(intercept.normal, dir) * self.intensity
         intensity = max(0,min(1, intensity))
         intensity *= 1 - intercept.obj.material.ks
@@ -72,12 +125,12 @@ class PointLight(Light):
         return  [(i * intensity) for i in self.color]
 
     def getSpecularColor(self, intercept, viewPos):
-        dir = np.subtract(self.point,intercept.point)
+        dir = ml.restar_vector_de_vector(self.point,intercept.point)
 
         reflect = reflectVector(intercept.normal, dir)
 
-        viewDir = np.subtract(viewPos, intercept.point)
-        viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / ml.norma_linalg(viewDir))
+        viewDir = ml.restar_vector_de_vector(viewPos, intercept.point)
+        viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / viewDir)
 
         specIntensity = max(0, ml.producto_punto(viewDir, reflect)) ** intercept.obj.material.spec
         specIntensity *= intercept.obj.material.ks

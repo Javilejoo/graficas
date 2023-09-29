@@ -2,53 +2,72 @@ import pygame
 from pygame.locals import *
 
 from rt import Raytracer
+
 from figuras import *
 from lights import *
 from materials import *
 
-width = 256
-height = 256
+width = 500
+height = 500
 pygame.init() 
 
-screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE)
+screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE )
 screen.set_alpha(None)
 
+
 raytracer = Raytracer(screen)
-raytracer.rtClearColor(0.25,0.25,0.85)
 
-""" brick = Material(diffuse = (1,0.4,0.4), spec = 8, ks = 0.01)
+raytracer.envMap = pygame.image.load("environmentMap2.jpg")
+raytracer.rtClearColor(0.25,0.25,0.25)
+
+earthTexture = pygame.image.load("earthTextureMap.jpg")
+ballTexture = pygame.image.load("basketballTextureMap.jpg")
+marbleTexture = pygame.image.load("marbleTextureMap.jpg")
+gemTexture = pygame.image.load("gemTexture.png")
+pokeballTexture = pygame.image.load("pokeballTexture.jpg")
+
+#OPAQUE
+earth = Material(texture = earthTexture,spec = 32, ks = 0.1, matType = OPAQUE )
+ball = Material(texture = pokeballTexture,spec = 64, ks = 0.2, matType = OPAQUE )
+
+#REFLECTIVE
+marble = Material(texture = marbleTexture,spec = 64, ks = 0.1, matType=REFLECTIVE )
+blueMirror = Material(diffuse = (0.4,0.4,0.9), spec = 32, ks = 0.15, matType = REFLECTIVE)
+#TRANSPARENT
+gem = Material(texture = gemTexture, diffuse = (0.7,0.8,0.9), spec = 128, ks = 0.2, ior= 2.417, matType = TRANSPARENT)
+diamond = Material(diffuse = (0.9,0.9,0.9), spec = 128, ks = 0.2, ior= 2.417, matType = TRANSPARENT)
+
+#Opaque
+raytracer.scene.append(Sphere(position=(-3,2,-8), radius = 1, material=ball))
+raytracer.scene.append(Sphere(position=(-3,-1,-8), radius = 1, material=earth))
+
+#REFLECTIVOS
+raytracer.scene.append(Sphere(position=(0,2,-8), radius = 1, material=marble))
+raytracer.scene.append(Sphere(position=(0,-1,-8), radius = 1, material=blueMirror))
+
+#TRANSPARENT
+raytracer.scene.append(Sphere(position=(3,2,-8), radius = 1, material=gem))
+raytracer.scene.append(Sphere(position=(3,-1,-8), radius = 1, material=diamond))
+
+
+brick = Material(diffuse = (1,0.4,0.4), spec = 8, ks = 0.01)
 grass = Material(diffuse = (0.4,1,0.4), spec =32, ks = 0.1) 
-water = Material(diffuse = (0.4,0.4,1), spec = 256, ks = 0.2 ) """
-snow = Material(diffuse= (1,1,1), spec= 0.2, ks = 0.1)
-rock = Material(diffuse=(0,0,0), spec = 3, ks = 0.1)
-carot = Material(diffuse=(1,0.5,0), spec = 0.5, ks = 0.3)
-eyes = Material(diffuse= (0.9,0.9,0.9), spec= 0.4, ks = 0.1)
+water = Material(diffuse = (0.4,0.4,1), spec = 256, ks = 0.2 )
 
-#Cuerpo
-raytracer.scene.append(Sphere(position = (0,-2,-9), radius=2, material = snow))
-raytracer.scene.append(Sphere(position = (0,-1.5,-7.2), radius=0.3, material = rock))
 
-#mitad
-raytracer.scene.append(Sphere(position = (0,1,-9), radius=1.5, material = snow))
-raytracer.scene.append(Sphere(position = (0,0,-8), radius=0.3, material = rock))
-raytracer.scene.append(Sphere(position = (0,1.5,-7.7), radius=0.3, material = rock))
-
-#Cabeza
-raytracer.scene.append(Sphere(position = (0,3.4,-9), radius=1, material = snow))
-raytracer.scene.append(Sphere(position = (0,2.9,-7.7), radius=0.3, material = carot))
-raytracer.scene.append(Sphere(position = (-0.4,3.2,-7.7), radius=0.25, material = eyes))
-raytracer.scene.append(Sphere(position = (0.4,3.2,-7.7), radius=0.25, material = eyes))
-raytracer.scene.append(Sphere(position = (-0.4,3.2,-7.5), radius=0.1, material = rock))
-raytracer.scene.append(Sphere(position = (0.4,3.2,-7.5), radius=0.1, material = rock))
-raytracer.scene.append(Sphere(position = (0,2.2,-7.7), radius=0.1, material = rock))
-raytracer.scene.append(Sphere(position = (0.5,2.4,-7.7), radius=0.1, material = rock))
-raytracer.scene.append(Sphere(position = (-0.5,2.4,-7.7), radius=0.1, material = rock))
+mirror = Material(diffuse = (0.9,0.9,0.9), spec = 64, ks = 0.2, matType = REFLECTIVE)
+glass = Material(diffuse= (0.9,0.9,0.9),spec = 64, ks = 0.15, ior = 1.5, matType=TRANSPARENT)
+water = Material(diffuse = (0.4,0.4,1.0), spec = 128, ks = 0.2, ior= 1.33, matType = TRANSPARENT)
 
 #Luces
-raytracer.lights.append(AmbientLight(intensity=0.2, color=(1, 1, 1)))  
-raytracer.lights.append(DirectionalLight(direction=(-1, -1, -1), intensity=0.8, color=(1, 1, 1)))  
-raytracer.lights.append(PointLight(point=(0, 0, -5), intensity=0.5, color=(1, 1, 1)))  
+raytracer.lights.append(AmbientLight(intensity=0.1))  
+raytracer.lights.append(DirectionalLight(direction=(-1, -1, -1), intensity=0.9))  
+#raytracer.lights.append(PointLight(point=(1.5, 0, -5), intensity=1, color=(1, 0, 1)))   
 
+raytracer.rtClear()
+raytracer.rtRender()
+
+print("\nrender time", pygame.time.get_ticks()/1000, "secs")
 isRunning = True
 while isRunning:  
     for event in pygame.event.get():
@@ -56,10 +75,13 @@ while isRunning:
             isRunning = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                isRunning = False      
+                isRunning = False
+rect = pygame.Rect(0,0,width,height)   
+sub = screen.subsurface(rect)
+pygame.image.save(sub, "screenshot.jpg")   
     
-    raytracer.rtClear()#Borra lo que esta
-    raytracer.rtRender()# Vuelve a  dibujar
-    pygame.display.flip()
+    #raytracer.rtClear()#Borra lo que esta
+    #raytracer.rtRender()# Vuelve a  dibujar
+    #pygame.display.flip()
 
 pygame.quit()
