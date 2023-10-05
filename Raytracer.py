@@ -7,11 +7,11 @@ from figuras import *
 from lights import *
 from materials import *
 
-width = 500
-height = 500
+width = 256
+height = 256
 pygame.init() 
 
-screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE )
+screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE | pygame.SCALED )
 screen.set_alpha(None)
 
 
@@ -26,28 +26,29 @@ marbleTexture = pygame.image.load("marbleTextureMap.jpg")
 gemTexture = pygame.image.load("gemTexture.png")
 pokeballTexture = pygame.image.load("pokeballTexture.jpg")
 
-#OPAQUE
+#OPAQUE MATS
 earth = Material(texture = earthTexture,spec = 32, ks = 0.1, matType = OPAQUE )
 ball = Material(texture = pokeballTexture,spec = 64, ks = 0.2, matType = OPAQUE )
 
-#REFLECTIVE
+#REFLECTIVE MATS
 marble = Material(texture = marbleTexture,spec = 64, ks = 0.1, matType=REFLECTIVE )
 blueMirror = Material(diffuse = (0.4,0.4,0.9), spec = 32, ks = 0.15, matType = REFLECTIVE)
-#TRANSPARENT
+#TRANSPARENT MATS
 gem = Material(texture = gemTexture, diffuse = (0.7,0.8,0.9), spec = 128, ks = 0.2, ior= 2.417, matType = TRANSPARENT)
 diamond = Material(diffuse = (0.9,0.9,0.9), spec = 128, ks = 0.2, ior= 2.417, matType = TRANSPARENT)
 
-#Opaque
-raytracer.scene.append(Sphere(position=(-3,2,-8), radius = 1, material=ball))
-raytracer.scene.append(Sphere(position=(-3,-1,-8), radius = 1, material=earth))
 
-#REFLECTIVOS
-raytracer.scene.append(Sphere(position=(0,2,-8), radius = 1, material=marble))
-raytracer.scene.append(Sphere(position=(0,-1,-8), radius = 1, material=blueMirror))
+#Opaque 
+#raytracer.scene.append(Sphere(position=(-3,2,-8), radius = 1, material=ball))
+#raytracer.scene.append(Sphere(position=(-3,-1,-8), radius = 1, material=earth))
 
-#TRANSPARENT
-raytracer.scene.append(Sphere(position=(3,2,-8), radius = 1, material=gem))
-raytracer.scene.append(Sphere(position=(3,-1,-8), radius = 1, material=diamond))
+#REFLECTIVES
+#raytracer.scene.append(Sphere(position=(0,2,-8), radius = 1, material=marble))
+#raytracer.scene.append(Sphere(position=(0,-1,-8), radius = 1, material=blueMirror))
+
+#TRANSPARENTS
+#raytracer.scene.append(Sphere(position=(3,2,-8), radius = 1, material=gem))
+#raytracer.scene.append(Sphere(position=(3,-1,-8), radius = 1, material=diamond))
 
 
 brick = Material(diffuse = (1,0.4,0.4), spec = 8, ks = 0.01)
@@ -59,6 +60,9 @@ mirror = Material(diffuse = (0.9,0.9,0.9), spec = 64, ks = 0.2, matType = REFLEC
 glass = Material(diffuse= (0.9,0.9,0.9),spec = 64, ks = 0.15, ior = 1.5, matType=TRANSPARENT)
 water = Material(diffuse = (0.4,0.4,1.0), spec = 128, ks = 0.2, ior= 1.33, matType = TRANSPARENT)
 
+raytracer.scene.append(Sphere(position=(0,0.5,-5), radius = 1, material=blueMirror))
+raytracer.scene.append(Plane(position= (0,-5,0), normal = (0,1,0), material = brick))
+raytracer.scene.append(Disk(position= (0,-1,-5), normal = (0,1,0),radius = 1.5, material = mirror))
 #Luces
 raytracer.lights.append(AmbientLight(intensity=0.1))  
 raytracer.lights.append(DirectionalLight(direction=(-1, -1, -1), intensity=0.9))  
