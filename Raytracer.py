@@ -25,10 +25,12 @@ ballTexture = pygame.image.load("basketballTextureMap.jpg")
 marbleTexture = pygame.image.load("marbleTextureMap.jpg")
 gemTexture = pygame.image.load("gemTexture.png")
 pokeballTexture = pygame.image.load("pokeballTexture.jpg")
+chestTexture = pygame.image.load("chest.jpg")
 
 #OPAQUE MATS
 earth = Material(texture = earthTexture,spec = 32, ks = 0.1, matType = OPAQUE )
 ball = Material(texture = pokeballTexture,spec = 64, ks = 0.2, matType = OPAQUE )
+chest = Material(texture = chestTexture,spec = 64, ks = 0.2, matType = OPAQUE )
 
 #REFLECTIVE MATS
 marble = Material(texture = marbleTexture,spec = 64, ks = 0.1, matType=REFLECTIVE )
@@ -60,9 +62,15 @@ mirror = Material(diffuse = (0.9,0.9,0.9), spec = 64, ks = 0.2, matType = REFLEC
 glass = Material(diffuse= (0.9,0.9,0.9),spec = 64, ks = 0.15, ior = 1.5, matType=TRANSPARENT)
 water = Material(diffuse = (0.4,0.4,1.0), spec = 128, ks = 0.2, ior= 1.33, matType = TRANSPARENT)
 
-raytracer.scene.append(Sphere(position=(0,0.5,-5), radius = 1, material=blueMirror))
-raytracer.scene.append(Plane(position= (0,-5,0), normal = (0,1,0), material = brick))
-raytracer.scene.append(Disk(position= (0,-1,-5), normal = (0,1,0),radius = 1.5, material = mirror))
+#raytracer.scene.append(Sphere(position=(0,0.5,-5), radius = 1, material=blueMirror))
+#raytracer.scene.append(Plane(position= (0,-5,0), normal = (0,1,0), material = brick))
+#raytracer.scene.append(Disk(position= (0,-1,-5), normal = (0,1,0),radius = 1.5, material = mirror))
+raytracer.scene.append(AABB(position= (-1.5,1.5,-5), size = (1,1,1), material = chest))
+raytracer.scene.append(AABB(position= (-1.5,-1.5,-5), size = (1,1,1), material = brick))
+raytracer.scene.append(AABB(position= (1.5,1.5,-5), size = (1,1,1), material = mirror))
+raytracer.scene.append(AABB(position= (1.5,-1.5,-5), size = (1,1,1), material = glass))
+
+
 #Luces
 raytracer.lights.append(AmbientLight(intensity=0.1))  
 raytracer.lights.append(DirectionalLight(direction=(-1, -1, -1), intensity=0.9))  
