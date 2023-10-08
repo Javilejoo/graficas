@@ -1,5 +1,4 @@
 import mathLib as ml
-import numpy as np
 from math import pi, atan2, acos
 
 class Intercept(object):
@@ -60,22 +59,26 @@ class Sphere(Shape):
 
 class Plane(Shape):
   def __init__(self, position, normal, material):
-    self.normal = normal / np.linalg.norm(normal)
+    #self.normal = normal / np.linalg.norm(normal)
+    self.normal = ml.multiplicar_vector_por_escalar(normal, 1 / ml.norma_linalg(normal))
+
     super().__init__(position, material)
 
   def ray_intersect(self, orig, dir):
     # Distancia = ((planePos - origRay) o normal) / (dirRay o normal)
-    denom = np.dot(dir, self.normal)
+    denom = ml.producto_punto(dir, self.normal)
     if abs(denom) <= 0.0001:
       return None
-    num = np.dot(np.subtract(self.position,orig), self.normal)
+    num = ml.producto_punto(ml.restar_vector_de_vector(self.position,orig), self.normal)
     t = num / denom
 
     if t < 0:
       return None
       
     # P = O + D * t0
-    P = np.add(orig, t * np.array(dir))
+    #P = np.add(orig, t * np.array(dir))
+    P = ml.sumar_vectores(orig, ml.multiplicar_vector_por_escalar(dir, t))
+
       
     return Intercept(distance = t,
                      point = P,
@@ -94,8 +97,8 @@ class Disk(Plane):
     if planeInterect is None:
       return None
     
-    contactDistance = np.subtract(planeInterect.point, self.position) #vector quiero magnitud
-    contactDistance = np.linalg.norm(contactDistance)
+    contactDistance = ml.restar_vector_de_vector(planeInterect.point, self.position) #vector quiero magnitud
+    contactDistance = ml.norma_linalg(contactDistance)
 
     if contactDistance > self.radius:
       return None
@@ -115,14 +118,14 @@ class AABB(Shape):
     self.size = size
 
     
-    leftPlane = Plane(np.add(self.position , (-size[0]/ 2,0,0)), (-1,0,0), material )
-    rightPlane = Plane(np.add(self.position , (size[0] / 2,0,0)), (1,0,0), material )
+    leftPlane = Plane(ml.sumar_vectores(self.position , (-size[0]/ 2,0,0)), (-1,0,0), material )
+    rightPlane = Plane(ml.sumar_vectores(self.position , (size[0] / 2,0,0)), (1,0,0), material )
 
-    bottomPlane = Plane(np.add(self.position, (0,-size[1] / 2,0)),(0,-1,0),material)
-    topPlane = Plane(np.add(self.position, (0,size[1] / 2,0)),(0,1,0),material)
+    bottomPlane = Plane(ml.sumar_vectores(self.position, (0,-size[1] / 2,0)),(0,-1,0),material)
+    topPlane = Plane(ml.sumar_vectores(self.position, (0,size[1] / 2,0)),(0,1,0),material)
 
-    backPlane = Plane(np.add(self.position, (0,0,-size[2] / 2)),(0,0,-1),material)
-    frontPlane = Plane(np.add(self.position, (0,0,size[2] / 2)),(0,0,1),material)
+    backPlane = Plane(ml.sumar_vectores(self.position, (0,0,-size[2] / 2)),(0,0,-1),material)
+    frontPlane = Plane(ml.sumar_vectores(self.position, (0,0,size[2] / 2)),(0,0,1),material)
 
     self.planes.append(leftPlane)
     self.planes.append(rightPlane)

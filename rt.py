@@ -1,6 +1,5 @@
 from math import tan, pi, atan2, acos
 import random
-import numpy as np
 import mathLib as ml
 import pygame
 
