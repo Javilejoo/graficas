@@ -7,8 +7,8 @@ from figuras import *
 from lights import *
 from materials import *
 
-width = 500
-height = 500
+width = 100
+height = 100
 pygame.init() 
 
 screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE  )

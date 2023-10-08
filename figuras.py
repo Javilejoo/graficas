@@ -1,4 +1,4 @@
-import mathLib as ml
+import mathlib as ml
 from math import pi, atan2, acos
 
 class Intercept(object):

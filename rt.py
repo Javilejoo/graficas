@@ -1,6 +1,6 @@
 from math import tan, pi, atan2, acos
 import random
-import mathLib as ml
+import mathlib as ml
 import pygame
 
 from materials import *

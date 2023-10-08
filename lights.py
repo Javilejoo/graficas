@@ -1,4 +1,4 @@
-import mathLib as ml
+import mathlib as ml
 from math import acos, asin
 def reflectVector(normal,direction):
     reflect = 2* ml.producto_punto(normal, direction)
