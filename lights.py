@@ -130,7 +130,8 @@ class PointLight(Light):
         reflect = reflectVector(intercept.normal, dir)
 
         viewDir = ml.restar_vector_de_vector(viewPos, intercept.point)
-        viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / viewDir)
+        viewDir = ml.normalizar(viewDir)
+        #viewDir = ml.multiplicar_vector_por_escalar(viewDir, 1 / viewDir)
 
         specIntensity = max(0, ml.producto_punto(viewDir, reflect)) ** intercept.obj.material.spec
         specIntensity *= intercept.obj.material.ks
