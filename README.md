@@ -1,4 +1,7 @@
 correr raytracer.py que es el que corre todo el porgrama. 
-Resultado final lab3
+Resultado final PROYECTO2:
+![screenshot](https://github.com/Javilejoo/graficas/assets/83861800/57d4d3b7-58c8-4f90-beab-43a219c76295)
 
-![screenshot](https://github.com/Javilejoo/graficas/assets/83861800/53de564c-6f80-4a61-ad1c-ca9a2f8437c5)
+REFERENCIAS:
+![REFERENCIAS](https://github.com/Javilejoo/graficas/assets/83861800/5f8a88f3-f758-47e0-bfcb-9d37840fbd78)
+
