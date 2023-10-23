@@ -6,6 +6,7 @@ import pygame
 from materials import *
 from lights import *
 MAX_RECURSION_DEPTH = 3 
+
 #Mi libreria de graficas
 class Raytracer(object):
     def __init__(self, screen):
@@ -87,10 +88,10 @@ class Raytracer(object):
                 return [i / 255 for i in envColor]
             else:   
                 return None
+            
         #Phong reflection Model
         #LightColor = Ambient Difuse + Specular
         # FinalColor =  SurfaceColor * LightColor
-
         material = intercept.obj.material
         surfaceColor = material.diffuse
         if material.texture and intercept.texcoords:
@@ -128,14 +129,10 @@ class Raytracer(object):
                         if lightDir_norm != 0:
                             lightDir = ml.multiplicar_vector_por_escalar(lightDir, 1 / lightDir_norm)
 
-
                     shadowIntersect = self.rtCastRay(intercept.point, lightDir, intercept.obj)
                     if shadowIntersect == None:
                         diffuseColor = [(diffuseColor[i] + light.getDiffuseColor(intercept)[i]) for i  in range(3)]
                         specularColor = [specularColor[i] + light.getSpecularColor(intercept, self.camPosition)[i] for i  in range(3)]
-
-                            
-            
 
         elif material.matType == REFLECTIVE: 
             rayDirection_negado = [ i * -1 for i in rayDirection]
@@ -207,8 +204,6 @@ class Raytracer(object):
                 reflectColor = ml.multiplicar_vector_por_escalar(reflectColor, Kr)
                 refractColor = ml.multiplicar_vector_por_escalar(refractColor, Kt)
 
-
-
         lightColor = [(ambientColor[i] + diffuseColor[i] + specularColor[i] + reflectColor[i] + refractColor[i]) for i in range(3)]
         finalColor = [min(1,surfaceColor[i]* lightColor[i]) for i  in range(3)]
         return finalColor                
@@ -236,8 +231,6 @@ class Raytracer(object):
                 direction_norm = ml.norma_linalg(direction)
                 if direction_norm != 0:
                     direction = ml.multiplicar_vector_por_escalar(direction, 1 / direction_norm)
-
-
                 intercept = self.rtCastRay(self.camPosition, direction)
 
                 rayColor = self.rtRayColor(intercept,direction)

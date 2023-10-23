@@ -1,3 +1,4 @@
+import math
 import mathlib as ml
 from math import pi, atan2, acos
 
@@ -24,7 +25,7 @@ class Sphere(Shape):
     super().__init__(position,material)
   
   def ray_intersect(self, orig, dir):
-    L = ml.restar_vector_de_vector(self.position, orig)
+    L = ml.restar_vectores(self.position, orig)
     lengthL = ml.norma_linalg(L)
     tca = ml.producto_punto(L, dir)
     d = (lengthL**2 - tca**2)**0.5
@@ -44,7 +45,7 @@ class Sphere(Shape):
       return None
     
     P = ml.sumar_vectores(orig, ml.multiplicar_vector_por_escalar(dir, t0))
-    normal = ml.restar_vector_de_vector(P,self.position)
+    normal = ml.restar_vectores(P,self.position)
     normal_norm = ml.norma_linalg(normal)
     if normal_norm != 0:
       normal = ml.multiplicar_vector_por_escalar(normal, 1 / normal_norm)
@@ -59,7 +60,6 @@ class Sphere(Shape):
 
 class Plane(Shape):
   def __init__(self, position, normal, material):
-    #self.normal = normal / np.linalg.norm(normal)
     self.normal = ml.multiplicar_vector_por_escalar(normal, 1 / ml.norma_linalg(normal))
 
     super().__init__(position, material)
@@ -69,14 +69,13 @@ class Plane(Shape):
     denom = ml.producto_punto(dir, self.normal)
     if abs(denom) <= 0.0001:
       return None
-    num = ml.producto_punto(ml.restar_vector_de_vector(self.position,orig), self.normal)
+    num = ml.producto_punto(ml.restar_vectores(self.position,orig), self.normal)
     t = num / denom
 
     if t < 0:
       return None
       
     # P = O + D * t0
-    #P = np.add(orig, t * np.array(dir))
     P = ml.sumar_vectores(orig, ml.multiplicar_vector_por_escalar(dir, t))
 
       
@@ -97,7 +96,7 @@ class Disk(Plane):
     if planeInterect is None:
       return None
     
-    contactDistance = ml.restar_vector_de_vector(planeInterect.point, self.position) #vector quiero magnitud
+    contactDistance = ml.restar_vectores(planeInterect.point, self.position) #vector quiero magnitud
     contactDistance = ml.norma_linalg(contactDistance)
 
     if contactDistance > self.radius:
@@ -200,10 +199,10 @@ class Triangle(Shape):
             center = ml.sumar_vectores(center, vertex)
         center = ml.multiplicar_vector_por_escalar(center, 1 / len(vertices))
         return center
-
+    
     def ray_intersect(self, orig, dir):
-        edge1 = ml.restar_vector_de_vector(self.vertices[1], self.vertices[0])
-        edge2 = ml.restar_vector_de_vector(self.vertices[2], self.vertices[0])
+        edge1 = ml.restar_vectores(self.vertices[1], self.vertices[0])
+        edge2 = ml.restar_vectores(self.vertices[2], self.vertices[0])
         h = ml.producto_vectorial(dir, edge2)
         a = ml.producto_punto(edge1, h)
 
@@ -211,7 +210,7 @@ class Triangle(Shape):
             return None
 
         f = 1.0 / a
-        s = ml.restar_vector_de_vector(orig, self.vertices[0])
+        s = ml.restar_vectores(orig, self.vertices[0])
         u = f * ml.producto_punto(s, h)
 
         if u < 0.0 or u > 1.0:
@@ -242,9 +241,9 @@ class Triangle(Shape):
                              obj=self)
         else:
             return None
-
+        
     def calculate_texcoords(self, u, v):
-        return u, v
+       return u, v 
 
 class Pyramid(Shape):
     def __init__(self, position, size, material):
@@ -273,100 +272,61 @@ class Pyramid(Shape):
             if intercept is not None:
                 if closest_intercept is None or intercept.distance < closest_intercept.distance:
                     closest_intercept = intercept
-        return closest_intercept
+        return closest_intercept 
 
-""" class Triangle(Shape):
-    def __init__(self, vertices, material, texcoords=None):
-        self.vertices = vertices
-        self.texcoords = texcoords
-        super().__init__(self.calculate_center(vertices), material)
 
-    def calculate_center(self, vertices):
-        # Calcula el centro del triangulo
-        center = [0, 0, 0]
-        for vertex in vertices:
-            center = ml.sumar_vectores(center, vertex)
-        center = ml.multiplicar_vector_por_escalar(center, 1 / len(vertices))
-        return center
-
-    def calculate_texcoords(self, u, v):
-        return u, v
+class Cylinder(Shape):
+    def __init__(self, position, radius, height, material):
+        super().__init__(position, material)
+        self.radius = radius
+        self.height = height
 
     def ray_intersect(self, orig, dir):
-        edge1 = ml.restar_vector_de_vector(self.vertices[1], self.vertices[0])
-        edge2 = ml.restar_vector_de_vector(self.vertices[2], self.vertices[0])
-        h = ml.producto_vectorial(dir, edge2)
-        a = ml.producto_punto(edge1, h)
+        # Parametros del cilindro
+        a = dir[0] * dir[0] + dir[2] * dir[2]
+        b = 2 * (dir[0] * (orig[0] - self.position[0]) + dir[2] * (orig[2] - self.position[2]))
+        c = (orig[0] - self.position[0]) * (orig[0] - self.position[0]) + (orig[2] - self.position[2]) * (orig[2] - self.position[2]) - self.radius * self.radius
 
-        if a > -0.00001 and a < 0.00001:
+        discriminant = b * b - 4 * a * c
+
+        if discriminant < 0:
             return None
 
-        f = 1.0 / a
-        s = ml.restar_vector_de_vector(orig, self.vertices[0])
-        u = f * ml.producto_punto(s, h)
+        t0 = (-b - math.sqrt(discriminant)) / (2 * a)
+        t1 = (-b + math.sqrt(discriminant)) / (2 * a)
 
-        if u < 0.0 or u > 1.0:
-            return None
+        y0 = orig[1] + t0 * dir[1]
+        y1 = orig[1] + t1 * dir[1]
 
-        q = ml.producto_vectorial(s, edge1)
-        v = f * ml.producto_punto(dir, q)
-
-        if v < 0.0 or u + v > 1.0:
-            return None
-
-        t = f * ml.producto_punto(edge2, q)
-
-        if t > 0.00001:
-            intersect_point = ml.sumar_vectores(orig, ml.multiplicar_vector_por_escalar(dir, t))
-            normal = ml.producto_vectorial(edge1, edge2)
-            normal_norm = ml.norma_linalg(normal)
-
-            if normal_norm != 0:
-                normal = ml.multiplicar_vector_por_escalar(normal, 1 / normal_norm)
-
-            if self.texcoords is not None:
-                u, v = self.calculate_texcoords(u, v)
-
-            return Intercept(distance=t,
-                             point=intersect_point,
-                             normal=normal,
-                             texcoords=(u, v), obj=self)
+        if y0 > self.position[1] and y0 < self.position[1] + self.height:
+            t = t0
+        elif y1 > self.position[1] and y1 < self.position[1] + self.height:
+            t = t1
         else:
             return None
 
-class Pyramid(Shape):
-    def __init__(self, position, size, material, texcoords=None):
-        super().__init__(position, material)
+        intersection_point = ml.sumar_vectores(orig, ml.multiplicar_vector_por_escalar(dir, t))
+        
+        if (
+            intersection_point[1] < self.position[1] or
+            intersection_point[1] > self.position[1] + self.height
+        ):
+            return None
 
-        # Calcula los vértices de la base cuadrada
-        self.vertices = [
-            ml.sumar_vectores(self.position, (-size / 2, 0, -size / 2)),
-            ml.sumar_vectores(self.position, (size / 2, 0, -size / 2)),
-            ml.sumar_vectores(self.position, (size / 2, 0, size / 2)),
-            ml.sumar_vectores(self.position, (-size / 2, 0, size / 2)),
+        normal = [
+            (intersection_point[0] - self.position[0]) / self.radius,
+            0,
+            (intersection_point[2] - self.position[2]) / self.radius,
         ]
+        #calculo de uvs
+        u = (math.atan2(normal[2], normal[0]) / (2 * math.pi)) + 0.5
+        v = (intersection_point[1] - self.position[1]) / self.height
 
-        # Vértice de la punta de la pirámide
-        apex = ml.sumar_vectores(self.position, (0, size, 0))
-
-        # Define las caras de la pirámide como triángulos
-        self.triangles = [
-    Triangle([self.vertices[0], self.vertices[1], self.vertices[2]], material),
-    Triangle([self.vertices[0], self.vertices[2], self.vertices[3]], material),
-    Triangle([self.vertices[0], self.vertices[1], apex], material),
-    Triangle([self.vertices[1], self.vertices[2], apex], material),
-    Triangle([self.vertices[2], self.vertices[3], apex], material),
-    Triangle([self.vertices[3], self.vertices[0], apex], material),
-]
-
-    def ray_intersect(self, orig, dir):
-        # Itera a través de los triángulos para encontrar intersecciones
-        closest_intercept = None
-        for triangle in self.triangles:
-            intercept = triangle.ray_intersect(orig, dir)
-            if intercept is not None:
-                if closest_intercept is None or intercept.distance < closest_intercept.distance:
-                    closest_intercept = intercept
-        return closest_intercept """
-
+        return Intercept(
+            distance=t,
+            point=intersection_point,
+            normal=normal,
+            texcoords=(u, v),
+            obj=self
+        )
 

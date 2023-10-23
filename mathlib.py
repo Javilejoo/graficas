@@ -22,12 +22,14 @@ def multiplicar_vector_por_escalar(vector, escalar):
 def multiplicar_vectores(vector1, vector2):
     return [x * y for x, y in zip(vector1, vector2)]
 
-def restar_vector_de_vector(vector1, vector2):
-    return [x - y for x, y in zip(vector1, vector2)]
-
 def producto_vectorial(vector1, vector2):
     x = vector1[1] * vector2[2] - vector1[2] * vector2[1]
     y = vector1[2] * vector2[0] - vector1[0] * vector2[2]
     z = vector1[0] * vector2[1] - vector1[1] * vector2[0]
     return [x, y, z]
+
+
+
+
+
 
