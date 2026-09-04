@@ -1,7 +1,6 @@
 from math import tan, pi, atan2, acos
 import random
-import numpy as np
-import mathLib as ml
+import mathlib as ml
 import pygame
 
 from materials import *
@@ -95,8 +94,8 @@ class Raytracer(object):
         material = intercept.obj.material
         surfaceColor = material.diffuse
         if material.texture and intercept.texcoords:
-            tX = intercept.texcoords[0] * material.texture.get_width()
-            tY = intercept.texcoords[1] * material.texture.get_height()
+            tX = intercept.texcoords[0] * material.texture.get_width() -1
+            tY = intercept.texcoords[1] * material.texture.get_height() - 1
             texColor = material.texture.get_at((int(tX),int(tY)))
             texColor = [i / 255 for i in texColor]
             surfaceColor = [surfaceColor[i] * texColor[i] for i in range(3) ]
